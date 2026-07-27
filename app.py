@@ -1,13 +1,41 @@
-# streamlit 실행 파일
 import streamlit as st
-st.title("학생 성장 대시보드")
-st.header("학생 현황")
-st.subheader("6MR1")
-st.write("안녕하세요.")
-st.text("안녕하세요..")
-st.write(100)
-st.write([1,2,3,4])
-st.success("PDT 입력 완료")
-st.info("오늘은 월요일입니다.")
-st.warning("숙제 미제출 학생 2명")
-st.error("CSV 파일을 찾을 수 없습니다.")
+
+student_page = st.Page(
+    "pages/student.py",
+    title="학생 현황",
+    icon="👨‍🎓"
+)
+
+growth_page = st.Page(
+    "pages/growth.py",
+    title="성장 분석",
+    icon="📈"
+)
+
+class_page = st.Page(
+    "pages/class_analysis.py",
+    title="학급 분석",
+    icon="🏫"
+)
+
+report_page = st.Page(
+    "pages/report.py",
+    title="리포트",
+    icon="📄"
+)
+
+pg = st.navigation(
+    [
+        student_page,
+        growth_page,
+        class_page,
+        report_page
+    ]
+)
+
+st.set_page_config(
+    page_title="학생 성장 대시보드",
+    layout="wide"
+)
+
+pg.run()
