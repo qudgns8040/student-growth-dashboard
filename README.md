@@ -3,6 +3,10 @@
 
 수학 학원 학생 데이터를 기반으로 학습 현황과 성장 추이를 분석하고 시각화하는 Streamlit 기반 데이터 분석 프로젝트입니다.
 
+## Demo
+실행 페이지:
+https://student-growth-dashboard-h8drx3hrm8vjrmqqt9yufq.streamlit.app/
+
 ## 프로젝트 소개
 
 학생별 PDT(일일 테스트), 숙제 수행 현황, 진도 데이터를 활용하여
@@ -70,3 +74,5 @@
 
 ```bash
 pip install -r requirements.txt
+
+
