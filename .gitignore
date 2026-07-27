@@ -1,0 +1,22 @@
+# git 에서 제외할 파일
+
+#python
+__pycache__/
+*.pyc
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Data
+*.csv
+*.xlsx
+
+# Environment
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
