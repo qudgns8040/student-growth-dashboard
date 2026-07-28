@@ -84,10 +84,36 @@ def load_daily_checklist():
         "daily_checklist.csv"
     )
 
-    return pd.read_csv(
+    df = pd.read_csv(
         path,
         encoding="utf-8-sig"
     )
+
+    # 컬럼명 공백 제거
+    df.columns = df.columns.str.strip()
+
+    # 타입 통일
+    df["날짜"] = df["날짜"].astype(str)
+    df["check_id"] = df["check_id"].astype(str)
+    df["학급코드"] = df["학급코드"].astype(str)
+    df["완료여부"] = pd.to_numeric(
+        df["완료여부"],
+        errors="coerce"
+    ).fillna(0).astype(int)
+
+    df["완료시간"] = (
+        df["완료시간"]
+        .fillna("")
+        .astype(str)
+    )
+
+    df["메모"] = (
+        df["메모"]
+        .fillna("")
+        .astype(str)
+    )
+
+    return df
 
 
 

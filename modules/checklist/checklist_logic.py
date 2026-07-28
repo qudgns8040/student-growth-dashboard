@@ -43,19 +43,17 @@ def update_check_status(
 ):
     """
     체크 상태 저장
-
-    check_id : 체크 항목 번호
-    class_code : 학급코드
-    status : True / False
     """
 
     daily = load_daily_checklist()
-
 
     now = datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S"
     )
 
+    # 타입 통일
+    check_id = str(check_id)
+    class_code = str(class_code)
 
     condition = (
         (daily["check_id"] == check_id)
@@ -63,29 +61,28 @@ def update_check_status(
         (daily["학급코드"] == class_code)
     )
 
+    # 조건에 맞는 데이터가 없으면 종료
+    if not condition.any():
+        return daily
 
+    # 완료 여부 저장
     daily.loc[
         condition,
         "완료여부"
-    ] = status
+    ] = 1 if status else 0
 
+    # 완료 시간 저장
+    daily.loc[
+        condition,
+        "완료시간"
+    ] = (
+        now
+        if status
+        else ""
+    )
 
-    if status:
-
-        daily.loc[
-            condition,
-            "완료시간"
-        ] = now
-
-    else:
-
-        daily.loc[
-            condition,
-            "완료시간"
-        ] = ""
-
-
-    save_daily_checklist(daily)
-
+    save_daily_checklist(
+        daily
+    )
 
     return daily
