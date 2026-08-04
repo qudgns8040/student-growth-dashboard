@@ -2,7 +2,8 @@
 from utils.date_utils import (
     get_today,
     get_today_day,
-    get_schedule_day_group
+    get_schedule_day_group,
+    get_today_class_day_group
 )
 from .checklist_repository import (
     load_checklist_master,
@@ -11,7 +12,7 @@ from .checklist_repository import (
     load_schedule_master,
     load_schedule_master_target
 )
-
+import pandas as pd
 
 # 체크리스트_마스터 데이터프레임 생성
 def create_checklist_master():
@@ -162,7 +163,7 @@ def create_schedule_view_data():
 
 ##################################################################
 # 체크 리스트 - rule N : master 1 조인
-def craete_checklist_dataset():
+def create_checklist_dataset():
     checklist_rule = load_checklist_rule()
     checklist_master = load_checklist_master()
 
@@ -174,3 +175,273 @@ def craete_checklist_dataset():
     )
 
     return checklist
+
+# 체크리스트 데이터 + 스케줄 병합해보기
+
+
+# 활성화 필터링
+def filter_checklist_rule_v1():
+    checklist = create_checklist_dataset()
+
+    active_checklist = checklist[
+        checklist["is_active"] == "Y"
+    ].copy()
+
+    return active_checklist
+
+# 체크리스트 룰 필터링 v2
+# 활성 규칙 중 현행 또는 전체 규칙만 조회
+def filter_checklist_rule_v2():
+    checklist = filter_checklist_rule_v1()
+
+    class_type_checklist = checklist[
+        checklist["class_type"].isin(["현행", "전체"])
+    ].copy()
+
+    return class_type_checklist
+
+# 체크리스트 룰 필터링 v3
+# 활성 규칙 + 현행 + 부담임(또는 전체)
+def filter_checklist_rule_v3():
+    checklist = filter_checklist_rule_v2()
+
+    teacher_role_checklist = checklist[
+        checklist["teacher_role"].isin(
+            ["부담임", "전체"]
+        )
+    ].copy()
+
+    return teacher_role_checklist
+
+# 체크리스트 룰 필터링 v4
+# 활성 + 현행 + 부담임 + 월수금 조건
+def filter_checklist_rule_v4():
+    checklist = filter_checklist_rule_v3()
+
+    day_type_checklist = checklist[
+        checklist["day_type"].isin(
+            ["월수금", "전체"]
+        )
+    ].copy()
+
+    return day_type_checklist
+
+############################# 체크리스트 룰 필터링 합치기 #############################
+def filter_checklist_rules(
+    apply_scope,
+    class_type,
+    teacher_role,
+    day_type
+):
+    checklist = create_checklist_dataset()
+
+    filtered = checklist[
+        (checklist["is_active"] == "Y")
+        & (checklist["schedule_type"].isin([apply_scope, "전체"]))
+        & (checklist["class_type"].isin([class_type, "전체"]))
+        & (checklist["teacher_role"].isin([teacher_role, "전체"]))
+        & (checklist["day_type"].isin([day_type, "전체"]))
+    ].copy()
+
+    return filtered
+
+# 체크리스트 <- 오늘 스케줄 첫 번째 행에 적용
+def create_today_checklist_v1():
+    schedule = create_today_schedule()
+
+    # 오늘 스케줄이 없는 경우
+    if schedule.empty:
+        return create_checklist_dataset().iloc[0:0].copy()
+
+    # 첫 번째 스케줄만 선택
+    first_schedule = schedule.iloc[0]
+
+    checklist = filter_checklist_rules(
+        apply_scope=first_schedule["schedule_type"],
+        class_type=first_schedule["class_type"],
+        teacher_role=first_schedule["teacher_role"],
+        day_type=first_schedule["day_group"]
+    )
+
+    return checklist
+
+# 체크리스트 <-스케줄 1번째 행 적용 -- 필터링 추가
+def create_today_checklist_v2():
+    schedule = create_today_schedule()
+
+    if schedule.empty:
+        return create_checklist_dataset().iloc[0:0].copy()
+
+    first_schedule = schedule.iloc[0]
+
+    checklist = filter_checklist_rules(
+        apply_scope=first_schedule["schedule_type"],
+        class_type=first_schedule["class_type"],
+        teacher_role=first_schedule["teacher_role"],
+        day_type=first_schedule["day_group"]
+    ).copy()
+
+    checklist["schedule_id"] = first_schedule["schedule_id"]
+    checklist["class_code"] = first_schedule["class_code"]
+    checklist["start_time"] = first_schedule["start_time"]
+    checklist["end_time"] = first_schedule["end_time"]
+
+    return checklist
+
+# 오늘 전체 체크리스트 생성
+def create_today_checklist_v3():
+    schedule = create_today_schedule()
+
+    # 오늘 스케줄이 없는 경우
+    if schedule.empty:
+        return create_checklist_dataset().iloc[0:0].copy()
+
+    checklist_list = []
+
+    # 오늘 스케줄을 한 행씩 반복
+    for _, schedule_row in schedule.iterrows():
+
+        # 현재 스케줄 조건에 맞는 업무 조회
+        checklist = filter_checklist_rules(
+            apply_scope=schedule_row["schedule_type"],
+            class_type=schedule_row["class_type"],
+            teacher_role=schedule_row["teacher_role"],
+            day_type=schedule_row["day_group"]
+        ).copy()
+
+        # 해당 스케줄에 적용되는 업무가 없으면 다음 일정으로 이동
+        if checklist.empty:
+            continue
+
+        # 스케줄 정보를 체크리스트 각 행에 추가
+        checklist["schedule_id"] = schedule_row["schedule_id"]
+        checklist["class_code"] = schedule_row["class_code"]
+        checklist["start_time"] = schedule_row["start_time"]
+        checklist["end_time"] = schedule_row["end_time"]
+
+        # 생성된 체크리스트를 리스트에 저장
+        checklist_list.append(checklist)
+
+    # 모든 스케줄에서 적용 업무가 없었던 경우
+    if not checklist_list:
+        return create_checklist_dataset().iloc[0:0].copy()
+
+    # 각 수업별 체크리스트를 하나의 DataFrame으로 결합
+    today_checklist = pd.concat(
+        checklist_list,
+        ignore_index=True
+    )
+
+    return today_checklist
+
+## 일일 공통 체크리스트 만들기
+def create_daily_common_checklist():
+    today_day_type = get_today_class_day_group()
+
+    if today_day_type is None:
+        return create_checklist_dataset().iloc[0:0].copy()
+
+    checklist = filter_checklist_rules(
+        apply_scope="일일공통",
+        class_type="전체",
+        teacher_role="전체",
+        day_type=today_day_type
+    ).copy()
+
+    if checklist.empty:
+        return checklist
+
+    checklist["schedule_id"] = None
+    checklist["class_code"] = None
+    checklist["start_time"] = None
+    checklist["end_time"] = None
+
+    return checklist
+
+## 스케줄별 체크리스트 만들기
+def create_schedule_based_checklist():
+    schedule = create_today_schedule()
+    checklist_list = []
+
+    for _, schedule_row in schedule.iterrows():
+        checklist = filter_checklist_rules(
+            apply_scope=schedule_row["schedule_type"],
+            class_type=schedule_row["class_type"],
+            teacher_role=schedule_row["teacher_role"],
+            day_type=schedule_row["day_group"]
+        ).copy()
+
+        if checklist.empty:
+            continue
+
+        checklist["schedule_id"] = schedule_row["schedule_id"]
+        checklist["class_code"] = schedule_row["class_code"]
+        checklist["start_time"] = schedule_row["start_time"]
+        checklist["end_time"] = schedule_row["end_time"]
+
+        checklist_list.append(checklist)
+
+    if not checklist_list:
+        return create_checklist_dataset().iloc[0:0].copy()
+
+    return pd.concat(
+        checklist_list,
+        ignore_index=True
+    )
+
+## 일일공통 + 스케줄별 체크리스트 합치기(최종)
+
+def create_today_checklist_v4():
+    checklist_list = []
+
+    common_checklist = create_daily_common_checklist()
+    schedule_checklist = create_schedule_based_checklist()
+
+    if not common_checklist.empty:
+        checklist_list.append(common_checklist)
+
+    if not schedule_checklist.empty:
+        checklist_list.append(schedule_checklist)
+
+    if not checklist_list:
+        return create_checklist_dataset().iloc[0:0].copy()
+
+    today_checklist = pd.concat(
+        checklist_list,
+        ignore_index=True
+    )
+
+    return today_checklist
+
+
+# 최종 체크리스트 컬럼 추리기
+def create_today_checklist_v5():
+    checklist = create_today_checklist_v4()
+
+    if checklist.empty:
+        return checklist
+
+    view_data = checklist[
+        [
+            "schedule_id",
+            "class_code",
+            "start_time",
+            "end_time",
+            "schedule_type",
+            "category",
+            "sub_category",
+            "task_name",
+            "description",
+            "display_order"
+        ]
+    ].copy()
+
+    view_data = view_data.sort_values(
+        by=[
+            "start_time",
+            "display_order"
+        ],
+        na_position="first"
+    ).reset_index(drop=True)
+
+    return view_data

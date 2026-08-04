@@ -11,7 +11,20 @@ from .checklist_logic import (
     create_schedule_dataset,
     create_today_schedule,
     create_schedule_view_data,
-    craete_checklist_dataset
+    create_checklist_dataset,
+    filter_checklist_rule_v1,
+    filter_checklist_rule_v2,
+    filter_checklist_rule_v3,
+    filter_checklist_rule_v4,
+    filter_checklist_rules,
+    create_today_checklist_v1,
+    create_today_checklist_v2,
+    create_today_checklist_v3,
+    create_today_checklist_v4,
+    create_daily_common_checklist,
+    create_schedule_based_checklist,
+    create_today_checklist_v5
+
 )
 
 # checklist_master 데이터프레임 출력 함수
@@ -118,21 +131,152 @@ def show_today_schedule2():
 
         st.divider()
 
-# 체크리스트 1
+# 업무 정의-룰 조인 데이터셋
 def show_checklist_dataset():
     st.title("체크리스트 데이터셋 rule-master 조인")
-
-    checklist = craete_checklist_dataset()
+    st.divider()
+    checklist = create_checklist_dataset()
     st.dataframe(
         checklist,
         use_container_width=True,
         hide_index=True
     )
 
+# 체크리스트 v001
+def show_checklist_rule_v1():
+    st.subheader("체크리스트 룰 v1")
+    st.divider()
 
+    checklist = filter_checklist_rule_v1()
 
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+# 체크리스트 V002
+def show_checklist_rule_v2():
+    st.subheader("체크리스트 룰 v2")
+
+    checklist = filter_checklist_rule_v2()
+
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+# 체크리스트 V003
+def show_checklist_rule_v3():
+    st.subheader("체크리스트 룰 v3")
+
+    checklist = filter_checklist_rule_v3()
+
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+
+# 체크리스트 V004
+def show_checklist_rule_v4():
+    st.subheader("체크리스트 룰 v4")
+
+    checklist = filter_checklist_rule_v4()
+
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+
+# 체크리스트 - 매개변수
+def show_checklist_rules():
+    checklist = filter_checklist_rules(
+        apply_scope="수업",
+        class_type="현행",
+        teacher_role="부담임",
+        day_type="월수금"
+    )
+
+    st.dataframe(checklist)
+
+# 체크리스트 - 스케줄 연동
+def show_today_checklist_v1():
+    st.subheader("오늘 체크리스트 v1")
+
+    checklist = create_today_checklist_v1()
+
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+
+# 체크리스트 - 스케줄 연동 필터링
+def show_today_checklist_v2():
+    st.subheader("오늘 체크리스트 v2")
+
+    checklist = create_today_checklist_v2()
+
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+
+# 체크리스트+스케줄 오늘 전체 출력
+def show_today_checklist_v3():
+    st.subheader("오늘 전체 체크리스트")
+
+    checklist = create_today_checklist_v3()
+
+    if checklist.empty:
+        st.info("오늘 생성된 체크리스트가 없습니다.")
+        return
+
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+
+# 최종 오늘 체크리스트 데이터프레임 출력
+def show_today_checklist_debug():
+    st.write("show_today_checklist_debug 함수 진입 성공")
+
+    common_checklist = create_daily_common_checklist()
+    st.write("일일공통 로직 실행 완료")
+    st.dataframe(common_checklist)
+
+    schedule_checklist = create_schedule_based_checklist()
+    st.write("스케줄별 로직 실행 완료")
+    st.dataframe(schedule_checklist)
+
+    today_checklist = create_today_checklist_v4()
+    st.write("최종 로직 실행 완료")
+    st.dataframe(today_checklist)
+
+# 최종 체크리스트 컬럼 추리기
+def show_today_checklist_v5():
+    st.subheader("오늘 체크리스트-컬럼")
+
+    checklist = create_today_checklist_v5()
+
+    if checklist.empty:
+        st.info("오늘 생성된 체크리스트가 없습니다.")
+        return
+
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+    
 # 최종 출력 페이지
 def show_checklist_page():
+
+
+
     # 데이터 출력
     show_checklistmaster_section()
     show_checklistrule_section()
@@ -149,8 +293,16 @@ def show_checklist_page():
     st.divider()
     #체크리스트
     show_checklist_dataset()
-
-
+    show_checklist_rule_v1()
+    show_checklist_rule_v2()
+    show_checklist_rule_v3()
+    show_checklist_rule_v4()
+    show_checklist_rules()
+    show_today_checklist_v1()
+    show_today_checklist_v2()
+    show_today_checklist_v3()
+    show_today_checklist_debug()
+    show_today_checklist_v5()
     
 
 

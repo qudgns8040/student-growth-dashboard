@@ -26,7 +26,7 @@ def get_today_day() -> str:
 
     return day_map[get_korea_now().weekday()]
 
-
+# 월, 수금, 화목, 토
 def get_schedule_day_group() -> str | None:
     """
     오늘 요일을 schedule_master의 요일 그룹으로 변환한다.
@@ -47,3 +47,25 @@ def get_schedule_day_group() -> str | None:
     }
 
     return day_group_map.get(get_today_day())
+
+# 월수금, 화목토
+def get_today_class_day_group() -> str | None:
+    """
+    한국 기준 오늘 요일을 학급 운영 요일 그룹으로 변환한다.
+
+    월·수·금 → 월수금
+    화·목·토 → 화목토
+    일요일   → None
+    """
+    today_day = get_today_day()
+
+    day_group_map = {
+        "월": "월수금",
+        "수": "월수금",
+        "금": "월수금",
+        "화": "화목토",
+        "목": "화목토",
+        "토": "화목토",
+    }
+
+    return day_group_map.get(today_day)
