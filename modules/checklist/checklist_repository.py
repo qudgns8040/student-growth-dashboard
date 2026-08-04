@@ -7,7 +7,6 @@ BASE_PATH = "data"
 
 # checklist_master.csv 불러오기
 def load_checklist_master():
-
     path = os.path.join(
         BASE_PATH,
         "checklist/master/checklist_master.csv"
