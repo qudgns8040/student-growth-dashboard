@@ -1,4 +1,4 @@
-﻿schedule_id,schedule_group,day_group,schedule_type,start_time,end_time,is_active
+﻿schedule_id,schedule_group,day_group,schedule_type,start_time,end_time,schedule_is_active
 S001,여름방학,수금,수업,15:30,16:25,Y
 S002,여름방학,수금,수업,16:25,17:25,Y
 S003,여름방학,수금,시험감독,17:30,17:55,Y
