@@ -1,0 +1,6 @@
+Master에 있는 업무를 어떤 조건에서 생성할지 정의
+
+rule_id
+R001
+check_id
+C001

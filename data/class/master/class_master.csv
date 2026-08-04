@@ -1,0 +1,5 @@
+﻿"class_code	class_type	teacher_role	요일	시작시간	엔드시간",grade,level_group,level_code,class_type,day_type,teacher_role,is_active
+"6MR1					",6,R,R1,현행,월수금,부담임,1
+"4MR					",4,R,R,선행,월수금,담임,1
+7MS1,7,S,S1,현행,월수금,부담임,1
+7MS2,7,S,S2,선행,월수금,담임,1

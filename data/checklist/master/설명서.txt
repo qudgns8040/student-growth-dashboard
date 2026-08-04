@@ -1,0 +1,15 @@
+업무 자체를 정의하는 기준 데이터 / 변하지 않음
+
+예) 
+check_id 
+C001 
+category
+수업전
+task_name
+출석체크
+task_detail
+학생 출석 확인 
+sort_order
+1
+is_active
+Y

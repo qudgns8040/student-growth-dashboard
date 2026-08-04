@@ -1,0 +1,9 @@
+﻿check_id,category,sub_category,task_name,description,display_order,target
+C001,수업전,PDT준비,PDT 제작,담당 반 PDT 제작,1,
+C002,수업전,PDT준비,PDT 출력,출력 및 파일 확인,2,
+C003,수업전,PDT준비,답안지 준비,교본/파일 준비,3,
+C004,수업전,PDT준비,진도 확인,각 반 진도 확인,4,
+C005,수업중,PDT준비,출석 체크,현행반 출석 확인,1,
+C006,수업중,PDT준비,PDT 풀이,시험지 풀이 진행,2,
+C007,수업중,PDT준비,숙제 검사,숙제 확인,3,
+C008,수업후,PDT준비,데일리 리포트 입력,테스트/수업내용 기록,1,

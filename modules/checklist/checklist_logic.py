@@ -1,27 +1,20 @@
+# 규칙을 처리가능하도록 설계 및 가공
 from datetime import datetime
-
 from .checklist_repository import (
     load_checklist_master,
-    load_daily_checklist,
-    save_daily_checklist
+    load_checklist_rule,
+    load_class_master,
+    load_schedule_master,
+    load_schedule_master_target
 )
 
 
-
+# 오늘 날짜 반환
 def get_today():
-    """
-    오늘 날짜 반환
-    """
-
     return datetime.today().strftime("%Y-%m-%d")
 
-
-
-def create_today_checklist():
-    """
-    checklist_master를 기준으로
-    오늘 체크리스트 생성
-    """
+# 체크리스트_마스터 데이터프레임 생성
+def create_checklist_master():
 
     checklist = load_checklist_master()
 
@@ -31,58 +24,53 @@ def create_today_checklist():
 
     checklist["완료여부"] = False
 
-
     return checklist
 
+# 체크리스트_룰 데이터프레임 생성
+
+def create_checklist_rule():
+
+    checklist_rule = load_checklist_rule()
+
+    return checklist_rule
 
 
-def update_check_status(
-        check_id,
-        class_code,
-        status
-):
-    """
-    체크 상태 저장
-    """
+# 클래스_마스터 데이터프레임 생성
+def create_class_master():
+    classmaster = load_class_master()
 
-    daily = load_daily_checklist()
+    return classmaster
 
-    now = datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
+# schedule_master 데이터 프레임 생성
+def create_schedule_master():
+    schedulemaster = load_schedule_master()
 
-    # 타입 통일
-    check_id = str(check_id)
-    class_code = str(class_code)
+    return schedulemaster
 
-    condition = (
-        (daily["check_id"] == check_id)
-        &
-        (daily["학급코드"] == class_code)
-    )
+# schedule_master_target 데이터 프레임 생성
+def craete_schedule_master_target():
+    schedulemaster_target = load_schedule_master_target()
 
-    # 조건에 맞는 데이터가 없으면 종료
-    if not condition.any():
-        return daily
+    return schedulemaster_target
 
-    # 완료 여부 저장
-    daily.loc[
-        condition,
-        "완료여부"
-    ] = 1 if status else 0
 
-    # 완료 시간 저장
-    daily.loc[
-        condition,
-        "완료시간"
-    ] = (
-        now
-        if status
-        else ""
-    )
+###################################
+# 스케줄 생성하기_Proto
+###################################
+# 스케줄 생성 규칙
+# 조인 -> 오늘 조건 필터 -> 오늘 스케줄
 
-    save_daily_checklist(
-        daily
-    )
+# def create_schedule():
 
-    return daily
+#     # check_id 기준 inner join
+
+
+
+#     master = load_checklist_master()
+#     rule = load_checklist_rule()
+
+#     schedule = master.merge(
+#         rule,
+#         on="check_id"
+#         how="inner"
+#     )

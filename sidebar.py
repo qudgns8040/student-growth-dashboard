@@ -4,7 +4,7 @@ def create_sidebar():
     st.sidebar.title(
         "수학의힘 강사 대시보드"
     )
-
+    st.sidebar.write("김병훈")
     menu = "Home"
 
     # =====================
@@ -14,7 +14,6 @@ def create_sidebar():
         "📋 업무 관리",
         expanded=True
     ):
-
         if st.button("오늘 체크리스트"):
             menu = "오늘 체크리스트"
 

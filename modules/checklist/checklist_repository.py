@@ -1,19 +1,16 @@
+## 데이터 접근/조합을 담당하는 계층
 import pandas as pd
 import os
 
-#체크리스트 데이터 폴더 위치
-BASE_PATH = "data/checklist"
+#체크리스트 데이터 위치
+BASE_PATH = "data"
 
-
-
+# checklist_master.csv 불러오기
 def load_checklist_master():
-    """
-    체크리스트 마스터(수업 정보) 불러오기
-    """
 
     path = os.path.join(
         BASE_PATH,
-        "checklist_master.csv"
+        "checklist/master/checklist_master.csv"
     )
 
     return pd.read_csv(
@@ -21,57 +18,48 @@ def load_checklist_master():
         encoding="utf-8-sig"
     )
 
-
-
-def load_checklist_history():
-    """
-    체크리스트 완료 기록 불러오기
-    """
-
+# checklist_rule.csv 불러오기
+def load_checklist_rule():
     path = os.path.join(
         BASE_PATH,
-        "checklist_history.csv"
+        "checklist/rule/checklist_rule.csv"
     )
-
     return pd.read_csv(
         path,
         encoding="utf-8-sig"
     )
 
-
-
-def load_schedule_master():
-    """
-    시간표 마스터 불러오기
-    """
-
-    path = os.path.join(
-        BASE_PATH,
-        "schedule_master.csv"
-    )
-
-    return pd.read_csv(
-        path,
-        encoding="utf-8-sig"
-    )
-
-
-
+# class_master.csv 불러오기
 def load_class_master():
-    """
-    학급 마스터 불러오기
-    """
-
     path = os.path.join(
         BASE_PATH,
-        "class_master.csv"
+        "class/master/class_master.csv"
     )
-
+    return pd.read_csv(
+        path,
+        encoding="utf-8-sig"
+    )
+# schedule_master.csv 불러오기
+def load_schedule_master():
+    path = os.path.join(
+        BASE_PATH,
+        "schedule/master/schedule_master.csv"
+    )
     return pd.read_csv(
         path,
         encoding="utf-8-sig"
     )
 
+# schedule_master_target.csv 불러오기
+def load_schedule_master_target():
+    path = os.path.join(
+        BASE_PATH,
+        "schedule/master/schedule_master_target.csv"
+    )
+    return pd.read_csv(
+        path,
+        encoding="utf-8-sig"
+    )
 
 
 def load_daily_checklist():
