@@ -12,6 +12,9 @@ def load_checklist_master():
         "checklist/master/checklist_master.csv"
     )
 
+    print("실행 중인 repository 파일:", __file__)
+    print("실제 읽는 경로:", path)
+
     return pd.read_csv(
         path,
         encoding="utf-8-sig"

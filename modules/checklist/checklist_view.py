@@ -10,7 +10,8 @@ from .checklist_logic import (
     create_schedule_v2,
     create_schedule_dataset,
     create_today_schedule,
-    create_schedule_view_data
+    create_schedule_view_data,
+    craete_checklist_dataset
 )
 
 # checklist_master 데이터프레임 출력 함수
@@ -117,19 +118,38 @@ def show_today_schedule2():
 
         st.divider()
 
+# 체크리스트 1
+def show_checklist_dataset():
+    st.title("체크리스트 데이터셋 rule-master 조인")
+
+    checklist = craete_checklist_dataset()
+    st.dataframe(
+        checklist,
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+
 # 최종 출력 페이지
 def show_checklist_page():
-
+    # 데이터 출력
     show_checklistmaster_section()
     show_checklistrule_section()
     show_classmaster_section()
     show_schedule_master()
     show_schedule_master_target()
+    st.divider()
+    # 스케줄
     show_schedule_v1()
     show_schedule_v2()
     show_schedule_dataset()
     show_today_schedule()
     show_today_schedule2()
+    st.divider()
+    #체크리스트
+    show_checklist_dataset()
+
 
     
 

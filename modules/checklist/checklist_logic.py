@@ -1,5 +1,9 @@
 # 규칙을 처리가능하도록 설계 및 가공
-from datetime import datetime
+from utils.date_utils import (
+    get_today,
+    get_today_day,
+    get_schedule_day_group
+)
 from .checklist_repository import (
     load_checklist_master,
     load_checklist_rule,
@@ -7,37 +11,6 @@ from .checklist_repository import (
     load_schedule_master,
     load_schedule_master_target
 )
-
-
-# 오늘 날짜 반환
-def get_today():
-    return datetime.today().strftime("%Y-%m-%d")
-
-# 오늘 요일 반환
-def get_today_day():
-    day_map = {
-        0: "월",
-        1: "화",
-        2: "수",
-        3: "목",
-        4: "금",
-        5: "토",
-        6: "일",
-    }
-    return day_map[datetime.today().weekday()]
-def get_today_day_group():
-    #오늘 요일값
-    today_day = get_today_day()
-
-    day_group_map = {
-        "월": "월",
-        "수": "수금",
-        "금": "수금",
-        "화": "화목",
-        "목": "화목",
-        "토": "토",
-    }
-    return day_group_map.get(today_day)
 
 
 # 체크리스트_마스터 데이터프레임 생성
@@ -98,9 +71,9 @@ def create_schedule_v1():
 def create_schedule_v2():
     schedule = create_schedule_v1()
 
-    today_day_group = get_today_day_group()
+    today_day_group = get_schedule_day_group()
 
-    #일요일
+    # 일요일
     if today_day_group is None:
         return schedule.iloc[0:0].copy()
 
@@ -144,7 +117,7 @@ def create_schedule_dataset():
 # 스케줄 - 오늘 일정에 맞게 필터링 로직
 def create_today_schedule():
     schedule = create_schedule_dataset()
-    today_day_group = get_today_day_group()
+    today_day_group = get_schedule_day_group()
 
     if today_day_group is None:
         return schedule.iloc[0:0].copy()
@@ -186,3 +159,18 @@ def create_schedule_view_data():
     )
 
     return grouped_schedule
+
+##################################################################
+# 체크 리스트 - rule N : master 1 조인
+def craete_checklist_dataset():
+    checklist_rule = load_checklist_rule()
+    checklist_master = load_checklist_master()
+
+    checklist = checklist_rule.merge(
+        checklist_master,
+        on="check_id",
+        how="inner",
+        validate="many_to_one"
+    )
+
+    return checklist
